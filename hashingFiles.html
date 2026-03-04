@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SHA-256 Hash Comparator</title>
+    <link rel="stylesheet" href="hashingFiles.css">
+    <link rel="icon" href="devIcon.png">
+</head>
+
+<body>
+
+    <header class="mainHeader">
+        <h1>SHA-256 Hash Comparator</h1>
+        <h1>|</h1>
+        <h4><a href="https://github.com/velacandledev">GitHub</a></h4>
+        <h4><a href="https://www.linkedin.com/in/daniel-vel%C3%A1zquez-carranza-43b118347/">LinkedIn</a></h4>
+        <h4><a href="https://instagram.com/velacarrdany">Instagram</a></h4>
+    </header>
+
+    <div class="container">
+
+        <p class="subtitle">Add two files to compare their hashes</p>
+
+        <div class="fileSection">
+
+            <div class="fileColumn">
+                <label>Add first file:</label>
+                <input type="file" id="fileInput1">
+
+                <div class="hashBox">
+                    <h3>Hash 1</h3>
+                    <p id="hash1"></p>
+                </div>
+            </div>
+
+            <div class="fileColumn">
+                <label>Add second file:</label>
+                <input type="file" id="fileInput2">
+
+                <div class="hashBox">
+                    <h3>Hash 2</h3>
+                    <p id="hash2"></p>
+                </div>
+            </div>
+
+        </div>
+
+        <button class="compareBtn" onclick="compareFiles()">Compare files</button>
+
+        <div class="statusBox">
+            <h3>Status</h3>
+            <p id="status"></p>
+        </div>
+    </div>
+
+    <script>
+        async function getFileHash(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(byte => byte.toString(16).padStart(2, "0")).join("");
+        }
+
+        async function compareFiles() {
+            const file1 = document.getElementById("fileInput1").files[0];
+            const file2 = document.getElementById("fileInput2").files[0];
+
+            if (!file1 || !file2) {
+                alert("Please add both files.");
+                return;
+            }
+
+            document.getElementById("status").textContent = "Processing...";
+
+            const hash1 = await getFileHash(file1);
+            const hash2 = await getFileHash(file2);
+
+            document.getElementById("hash1").textContent = hash1;
+            document.getElementById("hash2").textContent = hash2;
+
+            const statusElement = document.getElementById("status");
+
+            if (hash1 === hash2) {
+                statusElement.textContent = "The files are IDENTICAL";
+                statusElement.className = "identical";
+            } else {
+                statusElement.textContent = "The files are DIFFERENT";
+                statusElement.className = "different";
+            }
+        }
+    </script>
+
+</body>
+
+</html>
